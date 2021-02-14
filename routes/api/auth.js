@@ -29,7 +29,12 @@ router.post("/", (req, res) => {
           if (!isMatch)
             return res.status(400).json({ msg: "invalid password" });
           token = jwt.sign(
-            { id: user.id, username: user.username, email: user.email },
+            {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              imageUrl: user.imageUrl,
+            },
             jwtSecret
           );
           res.json({

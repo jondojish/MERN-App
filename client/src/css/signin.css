@@ -15,12 +15,14 @@ body {
   justify-content: center;
   padding-top: 160px;
   padding-bottom: 40px;
-  background-color: #1A1A1D;
+  background-color: #1a1a1d;
 }
 
 .form-signin {
   width: 100%;
-  max-width: 330px;
+  width: 300px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
   padding: 15px;
   margin: 0 auto;
 }

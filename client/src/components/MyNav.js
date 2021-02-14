@@ -8,7 +8,11 @@ const MyNav = (props) => {
         id="my_nav"
         className="navbar fixed-top navbar-expand-lg navbar-dark"
       >
-        <a href="/">
+        <a
+          onClick={() => {
+            props.history.push("/");
+          }}
+        >
           <img src={logo} alt="logo" width="60" />
         </a>
         <button
@@ -31,35 +35,46 @@ const MyNav = (props) => {
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"
-              href="/"
+              onClick={() => {
+                props.history.push("/");
+              }}
             >
               Home
             </a>
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"
-              href="/login"
+              onClick={() => {
+                props.history.push("/login");
+              }}
             >
               {props.token ? "Logout" : "Login"}
             </a>
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"
-              href="/profile"
+              onClick={() => {
+                props.history.push("/profile");
+              }}
             >
               Profile
             </a>
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"
-              href="/chat"
+              // href="/chat"
+              onClick={() => {
+                props.history.push("/chat");
+              }}
             >
               Chat
             </a>
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"
-              href="/messages"
+              onClick={() => {
+                props.history.push("/messages");
+              }}
             >
               Messages
             </a>

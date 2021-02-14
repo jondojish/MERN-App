@@ -6,6 +6,8 @@ const users = require("./routes/api/users");
 const auth = require("./routes/api/auth");
 const messages = require("./routes/api/messages");
 
+const imageUpload = require("./imageUpload");
+
 const app = express();
 
 // Body parser
@@ -37,11 +39,8 @@ mongoose
 app.use("/api/users", users);
 app.use("/api/auth", auth);
 app.use("/api/messages", messages);
+app.use("/api/", imageUpload);
 
 const port = process.env.PORT || 5000;
 
-app.get("/", (req, res) => {
-  res.send("Hello");
-});
-app;
 app.listen(port, () => `Server running on port ${port}`);

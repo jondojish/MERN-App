@@ -65,17 +65,20 @@ router.post("/", (req, res) => {
             .then((user) => {
               // creates jwt token
               token = jwt.sign(
-                { id: user.id, username: user.username, email: user.email },
+                {
+                  id: user.id,
+                  username: user.username,
+                  email: user.email,
+                  imageUrl: user.imageUrl,
+                },
                 jwtSecret
               );
 
               res.json({
                 token,
-                user: {
-                  id: user.id,
-                  username: user.username,
-                  email: user.email,
-                },
+                id: user.id,
+                username: user.username,
+                email: user.email,
               });
             })
             .catch(() => {

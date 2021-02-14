@@ -5,19 +5,24 @@ import Login from "./components/Login";
 import Logout from "./components/Logout";
 import MyNav from "./components/MyNav";
 import Home from "./components/Home";
+import Messages from "./components/Messages";
+import Profile from "./components/Profile";
+import Chat from "./components/Chat";
+import dotenv from "dotenv";
 import "./css/style.css";
 import axios from "axios";
 
-const App = () => {
+import "./css/messages.scss";
+import { ProcessCredentials } from "aws-sdk";
+dotenv.config();
+const App = (props) => {
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
 
+  const [user, setUser] = useState({});
+
   useEffect(() => {
     window.localStorage.setItem("token", token);
-  }, [token]);
-
-  const [user, setUser] = useState({});
-  useEffect(() => {
     const headers = { Authorization: token };
     axios
       .get("/api/users", { headers: headers })
@@ -32,8 +37,13 @@ const App = () => {
 
   return (
     <div className="App">
-      <MyNav token={token} />
       <Router>
+        <Route
+          path="/"
+          render={(props) => {
+            return <MyNav token={token} {...props} />;
+          }}
+        />
         <Switch>
           <Route
             exact
@@ -64,13 +74,50 @@ const App = () => {
               } else {
                 return (
                   <Logout
-                    username={user.username}
+                    {...user}
                     {...props}
                     token={token}
                     setToken={setToken}
                   />
                 );
               }
+            }}
+          />
+          <Route
+            exact
+            path="/messages"
+            render={(props) => {
+              if (token) {
+                return <Messages {...user} {...props} />;
+              } else {
+                return <Login token={token} setToken={setToken} {...props} />;
+              }
+            }}
+          />
+          <Route
+            exact
+            path="/chat"
+            render={(props) => {
+              if (token) {
+                return <Chat {...props} />;
+              } else {
+                return <Login token={token} setToken={setToken} {...props} />;
+              }
+            }}
+          />
+          <Route
+            exact
+            path="/profile"
+            render={(props) => {
+              return (
+                <Profile
+                  {...user}
+                  {...props}
+                  setUser={setUser}
+                  token={token}
+                  setToken={setToken}
+                />
+              );
             }}
           />
         </Switch>

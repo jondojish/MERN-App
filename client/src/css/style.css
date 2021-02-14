@@ -9,6 +9,23 @@ body {
   background: linear-gradient(to right, #91eae4, #86a8e7, #7f7fd5);
 }
 
+.container {
+  text-align: center;
+  padding-top: 65px;
+  height: 100%;
+  margin: 0;
+}
+a {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}
+/* .link {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+} */
+
 #my_nav {
   background-color: rgba(0, 0, 0, 0.4) !important;
 }
@@ -32,9 +49,9 @@ body {
   font-size: 14pt;
 }
 .form_wrapper {
+  background-color: rgba(0, 0, 0, 0.3);
   display: inline-block;
-  background-color: #fff;
-  border-radius: 5px;
+  border-radius: 10px;
   height: auto;
   padding: 15px 18px;
   margin: 5% auto;
@@ -42,6 +59,7 @@ body {
   margin-right: auto;
   min-width: 350px;
 }
+
 .login_flash {
   color: #eb0101;
 }

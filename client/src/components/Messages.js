@@ -75,7 +75,7 @@ const Messages = (props) => {
     getChatList();
   }, []);
 
-  const [allMessages, setAllMessages] = useState(["hi"]);
+  const [allMessages, setAllMessages] = useState([]);
 
   const allMessageRef = useRef([]);
   allMessageRef.current = allMessages;
@@ -88,22 +88,28 @@ const Messages = (props) => {
       .get(`/api/messages/${username}`, { headers })
       .then((response) => {
         const messages = response.data;
-        if (
-          messages[messages.length - 1]["_id"] !=
-          allMessageRef.current[allMessageRef.current.length - 1]["_id"]
-        ) {
+        if (allMessages.length != 0) {
+          if (
+            messages[messages.length - 1]["_id"] !=
+            allMessageRef.current[allMessageRef.current.length - 1]["_id"]
+          ) {
+            setAllMessages(messages);
+          }
+        } else {
           setAllMessages(messages);
         }
       })
       .catch((err) => {
-        console.log("oo");
         console.log(err);
       });
   };
 
   useEffect(() => {
     const checkForMessages = setInterval(() => {
-      getMessages(senderRef.current.username);
+      if (senderRef.current.username) {
+        getMessages(senderRef.current.username);
+      }
+      getChatList();
     }, 500);
     return () => {
       clearInterval(checkForMessages);

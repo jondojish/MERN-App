@@ -1,7 +1,7 @@
 //aws-sdk for node
 const aws = require("aws-sdk");
 const express = require("express");
-const Router = express.Router();
+const router = express.Router();
 const multer = require("multer");
 const auth = require("./middleware/auth");
 const User = require("./models/User");
@@ -22,12 +22,17 @@ const multerUploadInMemory = multer({
   storage: multerMemoryStorage,
 });
 
-Router.use(auth);
+router.use(auth);
 
-Router.post("/image", multerUploadInMemory.single("file"), (req, res) => {
+// @route POST api/profile/image
+// @desc POST a new profile picture
+// @access Private
+router.post("/image", multerUploadInMemory.single("file"), (req, res) => {
+  // multerUploadInMemory midleware populates request with a file object containing information about the processed file
   if (!req.file || !req.file.buffer) {
     throw new Error("File or buffer not found");
   }
+  // uploads file to s3 bucket
   s3.upload(
     {
       Bucket: process.env.bucket,
@@ -42,6 +47,7 @@ Router.post("/image", multerUploadInMemory.single("file"), (req, res) => {
         console.error(`ERROR: ${err.message}`);
         res.status(500).send({ message: err.message });
       }
+      // changes users profile picture to new image
       User.findById(req.user.id)
         .then(async (user) => {
           user.imageUrl = file.Location;
@@ -58,4 +64,4 @@ Router.post("/image", multerUploadInMemory.single("file"), (req, res) => {
   );
 });
 
-module.exports = Router;
+module.exports = router;

@@ -7,31 +7,31 @@ const User = require("../../models/User");
 
 // Message Model
 const Message = require("../../models/Message");
-const { eventNames } = require("../../models/User");
 
-// @route GET api/messages
-// @desc Get messages where sender or recipient is user
+// @route GET api/messages/names
+// @desc Get names of people who sent messages to user or user sent messages to
 // @access Private
-
 router.get("/names", auth, (req, res) => {
   const username = req.user.username;
   let alreadyAdded = [];
   let names = [];
   Message.find({ $or: [{ sender: username }, { recipient: username }] })
-    .then((messages) => {
+    .then(async (messages) => {
       for (msg of messages) {
         if (msg.sender != username && !alreadyAdded.includes(msg.sender)) {
-          names.push({ username: msg.sender, imageUrl: msg.senderImageUrl });
+          user = await User.findOne({ username: msg.sender });
+          imageUrl = user.imageUrl;
+          console.log;
+          names.push({ username: msg.sender, imageUrl });
           alreadyAdded.push(msg.sender);
         }
         if (
           msg.recipient != username &&
           !alreadyAdded.includes(msg.recipient)
         ) {
-          names.push({
-            username: msg.recipient,
-            imageUrl: msg.recipientImageUrl,
-          });
+          user = await User.findOne({ username: msg.recipient });
+          imageUrl = user.imageUrl;
+          names.push({ username: msg.recipient, imageUrl });
           alreadyAdded.push(msg.recipient);
         }
       }
@@ -40,31 +40,70 @@ router.get("/names", auth, (req, res) => {
     .catch((err) => res.status(500));
 });
 
-// @route GET api/messages
-// @desc Get messages from certain user
+// @route GET api/messages/names/:nameSearched
+// @desc Get names of people messaged via a partial name
 // @access Private
-router.get("/", auth, (req, res) => {
+router.get("/names/:nameSearched", auth, (req, res) => {
+  console.log("hi");
+  const username = req.user.username;
+  const nameSearched = req.params.nameSearched;
+  let alreadyAdded = [];
+  let names = [];
+  Message.find({
+    $or: [{ sender: username }, { recipient: username }],
+  })
+    .then((messages) => {
+      console.log(messages);
+      for (msg of messages) {
+        if (
+          msg.sender != username &&
+          msg.sender.includes(nameSearched) &&
+          !alreadyAdded.includes(msg.sender)
+        ) {
+          names.push({ username: msg.sender, imageUrl: msg.senderImageUrl });
+          alreadyAdded.push(msg.sender);
+        }
+        if (
+          msg.recipient != username &&
+          msg.recipient.includes(nameSearched) &&
+          !alreadyAdded.includes(msg.recipient)
+        ) {
+          console.log(msg);
+          names.push({
+            username: msg.recipient,
+            imageUrl: msg.recipientImageUrl,
+          });
+          alreadyAdded.push(msg.recipient);
+        }
+      }
+      console.log(names);
+      res.status(200).json(names);
+    })
+    .catch((err) => {
+      res.status(500);
+    });
+});
+
+// @route GET api/messages
+// @desc Get all messages from certain user
+// @access Private
+router.get("/:senderName", auth, (req, res) => {
   const allMessages = {};
-  const [username, sender] = [req.user.username, req.body.sender];
+  const [username, sender] = [req.user.username, req.params.senderName];
+
   Message.find({
     $or: [
       { sender: username, recipient: sender },
-      { recipient: username, sender: sender },
+      { sender: sender, recipient: username },
     ],
   })
-    .then((messages) => res.status(200).json(messages))
-    .catch((err) => res.status(500));
-
-  Message.find({ sender: username, recipient: sender })
-    .then((sentMessages) => (allMessages.sent = sentMessages))
-    .catch((err) => res.status(500));
-  Message.find({ sender: sender, recipient: username })
-    .then((recievedMessages) => (allMessages.recieved = recievedMessages))
+    .sort("-date")
+    .then((allMessages) => res.status(200).json(allMessages))
     .catch((err) => res.status(500));
 });
 
 // @route POST api/messages
-// @desc Send message
+// @desc Send message to specific user
 // @access Private
 router.post("/", auth, (req, res) => {
   const [username, recipient, message] = [
@@ -72,7 +111,6 @@ router.post("/", auth, (req, res) => {
     req.body.recipient,
     req.body.message,
   ];
-  console.log(req.body);
   User.findOne({ username: recipient })
     .then((recipient) => {
       senderImageUrl = req.user.imageUrl;

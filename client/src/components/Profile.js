@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
 
+const passIsValid = (pass1, pass2) => {
+  const errors = [];
+  if (pass1 != pass2) errors.push("Passwords dont match");
+  if (pass1.length < 8) errors.push("Password must be at least 8 characters");
+  if (!/\d/.test(pass1)) errors.push("Password must contain at least on digit");
+  if (errors.length > 0) return { errors };
+  return true;
+};
+
 const Profile = (props) => {
   const [uploadImage, setImage] = useState(null);
   const [errors, setErrors] = useState([]);
@@ -9,17 +18,48 @@ const Profile = (props) => {
   const refreshImage = () => {
     const headers = { Authorization: props.token };
     axios
-      .get("/api/users", { headers: headers })
-      .then((currUser) => {
-        console.log(currUser.data);
-        props.setUser(currUser.data);
+      .get("/api/users", { headers })
+      .then((response) => {
+        console.log(response.data);
+        props.setUser(response.data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const handleSubmit = (event) => {
+  const [oldPass, setOldPass] = useState("");
+  const [newPass1, setNewPass1] = useState("");
+  const [newPass2, setNewPass2] = useState("");
+
+  const changePassword = () => {
+    const passValid = passIsValid(newPass1, newPass2);
+    if (passValid !== true) {
+      setErrors((prevErr) => [...prevErr, ...passValid.errors]);
+      if (!oldPass) {
+        setErrors((prevErr) => [...prevErr, "must enter old password"]);
+      }
+    } else {
+      const headers = { Authorization: props.token };
+      const data = { oldPassEntered: oldPass, newPass: newPass1 };
+
+      axios
+        .post("/api/auth/changePassword", data, { headers })
+        .then((response) => {
+          console.log("jjk");
+
+          console.log(response);
+          setErrors((prevErr) => [...prevErr, response.data.msg]);
+        })
+        .catch((err) => {
+          console.log("jj");
+
+          setErrors((prevErr) => [...prevErr, err.response.data.msg]);
+        });
+    }
+  };
+
+  const changeProfilePic = (event) => {
     if (uploadImage != null) {
       const formData = new FormData();
       formData.append("file", uploadImage, uploadImage.filename);
@@ -28,9 +68,8 @@ const Profile = (props) => {
         "Content-Type": "multipart/form-data",
       };
       axios
-        .post("/api/image", formData, { headers })
+        .post("/api/profile/image", formData, { headers })
         .then((response) => {
-          console.log(props.token);
           console.log(response.data);
           refreshImage();
           setErrors((prevErrors) => [...prevErrors, "profile pictue changed"]);
@@ -39,14 +78,34 @@ const Profile = (props) => {
           console.log(err.response);
         });
     } else {
-      console.log("You need to select a file");
+      setErrors((prevErrors) => [...prevErrors, "You need to select a file"]);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (uploadImage && (newPass1 || newPass2 || oldPass)) {
+      changeProfilePic();
+      changePassword();
+    } else if (uploadImage) {
+      changeProfilePic();
+    } else if (newPass1 || newPass2 || oldPass) {
+      changePassword();
+    } else {
+      setErrors((prevErrors) => [
+        ...prevErrors,
+        "select an image or change password",
+      ]);
     }
   };
 
   let errorTags = [];
 
   errors.map((err) => {
-    errorTags.push(<p key={uuid()}>{err}</p>);
+    errorTags.push(
+      <p style={{ lineHeight: "5px" }} key={uuid()}>
+        {err}
+      </p>
+    );
   });
 
   return (
@@ -55,9 +114,9 @@ const Profile = (props) => {
       <div style={{ minWidth: "40%" }} className="form_wrapper">
         <form
           onSubmit={(event) => {
-            setErrors([]);
             event.preventDefault();
-            handleSubmit(event);
+            setErrors([]);
+            handleSubmit();
           }}
           encType="multipart/form-data"
         >
@@ -75,7 +134,10 @@ const Profile = (props) => {
             style={{ minWidth: "70%", borderRadius: "10px" }}
             placeholder="old password"
             type="password"
-            name="password_old"
+            name="oldPass"
+            onChange={(event) => {
+              setOldPass(event.target.value);
+            }}
           />
           <br />
           <br />
@@ -83,7 +145,10 @@ const Profile = (props) => {
             style={{ minWidth: "70%", borderRadius: "10px" }}
             placeholder="new password"
             type="password"
-            name="password1"
+            name="newPass1"
+            onChange={(event) => {
+              setNewPass1(event.target.value);
+            }}
           />
           <br />
           <br />
@@ -91,14 +156,14 @@ const Profile = (props) => {
             style={{ minWidth: "70%", borderRadius: "10px" }}
             placeholder="Confirm Password"
             type="password"
-            name="password2"
+            name="newPass2"
+            onChange={(event) => {
+              setNewPass2(event.target.value);
+            }}
           />
           <br />
           <br />
           <p>Change Profile Picture:</p>
-          {/* {% comment %}
-      {{profile_form.image}}
-      {% endcomment %} */}
 
           <input
             type="file"
@@ -109,34 +174,12 @@ const Profile = (props) => {
               console.log(event.target.files[0]);
             }}
           />
-          {/* {% if messages %} */}
-          {/* {% for msg in messages %} */}
-          {/* <p>{{ msg }}</p> */}
-          {/* {% endfor %} */}
-          {/* {% endif %} */}
-          {/* <!-- <br></br> --> */}
+
           <div
             className="p_error"
             style={{ lineHeight: "2px", paddingTop: "10px" }}
-          >
-            {/* {% if p_form.errors %}
-        {% for key, value in p_form.errors.items %}
-        {% for error in value %}
-        {% if error != 'This field is required.' %}
-        <p>{{ error|striptags }}</p>
-        {% endif%}
-        {% endfor %}
-        {% endfor %}
-        {% endif %} */}
-          </div>
+          ></div>
 
-          {/* {% if profile_form.errors %} */}
-          {/* {% for key, value in profile_form.errors.items %}
-      {% for error in value %}
-      <p>{{ error|striptags }}</p>
-      {% endfor %}
-      {% endfor %}
-      {% endif %} */}
           {errorTags}
           <button className="btn btn-slg btn-primary btn-block" type="submit">
             Submit

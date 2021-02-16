@@ -31,9 +31,8 @@ const Register = (props) => {
         props.history.push("/");
       })
       .catch((err) => {
-        console.log(err);
-        // setErrors([...errors, err.response.data.msg]);
-        // console.log(err.response.data.msg);
+        setErrors([...errors, err.response.data.msg]);
+        console.log(err.response.data.msg);
       });
   };
 

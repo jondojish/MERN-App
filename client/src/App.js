@@ -8,18 +8,17 @@ import Home from "./components/Home";
 import Messages from "./components/Messages";
 import Profile from "./components/Profile";
 import Chat from "./components/Chat";
-import dotenv from "dotenv";
 import "./css/style.css";
 import axios from "axios";
 
 import "./css/messages.scss";
-import { ProcessCredentials } from "aws-sdk";
-dotenv.config();
+
 const App = (props) => {
+  console.log("hill");
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
 
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     window.localStorage.setItem("token", token);
@@ -27,7 +26,6 @@ const App = (props) => {
     axios
       .get("/api/users", { headers: headers })
       .then((currUser) => {
-        console.log(currUser.data);
         setUser(currUser.data);
       })
       .catch((err) => {
@@ -88,7 +86,14 @@ const App = (props) => {
             path="/messages"
             render={(props) => {
               if (token) {
-                return <Messages {...user} {...props} />;
+                return (
+                  <Messages
+                    token={token}
+                    setToken={setToken}
+                    {...user}
+                    {...props}
+                  />
+                );
               } else {
                 return <Login token={token} setToken={setToken} {...props} />;
               }

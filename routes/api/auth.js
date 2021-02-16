@@ -9,7 +9,7 @@ const jwtSecret = process.env.jwtSecret;
 const User = require("../../models/User");
 
 // @route POST api/auth
-// @desc Auth User
+// @desc Authorises User
 // @access Public
 router.post("/", (req, res) => {
   const { email, password } = req.body;
@@ -26,8 +26,9 @@ router.post("/", (req, res) => {
       bcrypt
         .compare(password, user.password)
         .then((isMatch) => {
-          if (!isMatch)
+          if (!isMatch) {
             return res.status(400).json({ msg: "invalid password" });
+          }
           token = jwt.sign(
             {
               id: user.id,
@@ -52,6 +53,45 @@ router.post("/", (req, res) => {
     })
     .catch(() => {
       return res.status(500);
+    });
+});
+
+// @route POST api/auth/changePassword
+// @desc change Users password
+// @access Private
+
+router.post("/changePassword", auth, (req, res) => {
+  username = req.user.username;
+  [newPass, oldPassEntered] = [req.body.newPass, req.body.oldPassEntered];
+  User.findOne({ username })
+    .then((user) => {
+      bcrypt
+        .compare(oldPassEntered, user.password)
+        .then((isMatch) => {
+          if (!isMatch) {
+            return res.status(400).json({ msg: "password Incorrect" });
+          }
+          bcrypt.genSalt(10, (err, salt) => {
+            if (err) return res.status(500);
+            bcrypt.hash(newPass, salt, (err, hash) => {
+              user.password = hash;
+              user
+                .save()
+                .then((user) => {
+                  return res.status(200).json({ msg: "password changed" });
+                })
+                .catch((err) => {
+                  return res.status(500);
+                });
+            });
+          });
+        })
+        .catch((err) => {
+          res.status(500);
+        });
+    })
+    .catch((err) => {
+      res.status(500);
     });
 });
 

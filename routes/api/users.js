@@ -19,19 +19,37 @@ router.get("/", auth, (req, res) => {
     .catch((err) => res.status(500));
 });
 
-// @route GET api/users/id
-// @desc Get info of request user
+// @route GET api/users/:username
+// @desc Get info of requested user
 // @access Public
-router.get("/:id", (req, res) => {
-  const idIsValid = mongoose.Types.ObjectId.isValid(req.params.id);
-  if (!idIsValid) return res.status(404).json({ msg: "invalid id" });
-  User.findById(req.params.id)
+router.get("/:username", (req, res) => {
+  User.findOne({ username: req.params.username })
     .then((user) => {
       if (!user) {
         return res.status(404).json({ msg: "user not found" });
       }
+      return res
+        .status(200)
+        .json({ username: user.username, imageUrl: user.imageUrl });
+    })
+    .catch((err) => res.status(500));
+});
 
-      return res.status(200).json({ username: user.username });
+// @route GET api/users/search/:username
+// @desc Get users based on partial username
+// @access Private
+router.get("/search/:nameSearched", auth, (req, res) => {
+  nameSearched = req.params.nameSearched;
+  username = req.user.username;
+  names = [];
+  User.find({})
+    .then((users) => {
+      users.map((user) => {
+        if (user.username.includes(nameSearched) && user.username != username) {
+          names.push({ username: user.username, imageUrl: user.imageUrl });
+        }
+      });
+      return res.status(200).json(names);
     })
     .catch((err) => res.status(500));
 });

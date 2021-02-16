@@ -59,16 +59,7 @@ const MyNav = (props) => {
             >
               Profile
             </a>
-            <a
-              style={{ color: "white" }}
-              className="nav-item nav-link"
-              // href="/chat"
-              onClick={() => {
-                props.history.push("/chat");
-              }}
-            >
-              Chat
-            </a>
+
             <a
               style={{ color: "white" }}
               className="nav-item nav-link"

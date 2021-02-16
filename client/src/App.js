@@ -14,7 +14,6 @@ import axios from "axios";
 import "./css/messages.scss";
 
 const App = (props) => {
-  console.log("hill");
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
 

@@ -7,13 +7,14 @@ export const NameTag = (props) => {
   return (
     <li key={uuid()} className="active">
       <button
-        value={props.username}
+        value={username}
         name="senderButton"
         onClick={(event) => {
           props.setCurrSender({
             username,
             imageUrl,
           });
+          console.log(username);
           props.getMessages(username);
         }}
         id="sender"

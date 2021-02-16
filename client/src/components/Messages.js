@@ -9,7 +9,10 @@ const Messages = (props) => {
   const [currMessage, setCurrMessage] = useState("");
 
   const sendMessage = () => {
-    const data = { message: currMessage, recipient: currSender.username };
+    const data = {
+      message: currMessage,
+      recipient: senderRef.current.username,
+    };
     const headers = {
       Authorization: props.token,
       "Content-Type": "application/json",
@@ -41,12 +44,20 @@ const Messages = (props) => {
     }
   };
 
-  const senderName = window.localStorage.getItem("senderName");
-  const senderImage = window.localStorage.getItem("senderImage");
+  const senderName = localStorage.getItem("senderName");
+  const senderImage = localStorage.getItem("senderImage");
 
   const [currSender, setCurrSender] = useState(
     senderName ? { username: senderName, imageUrl: senderImage } : {}
   );
+
+  const senderRef = useRef({});
+  senderRef.current = currSender;
+
+  useEffect(() => {
+    localStorage.setItem("senderName", currSender.username);
+    localStorage.setItem("senderImage", currSender.imageUrl);
+  }, [currSender]);
 
   const getChatList = () => {
     const headers = { Authorization: props.token };
@@ -64,50 +75,57 @@ const Messages = (props) => {
     getChatList();
   }, []);
 
-  window.localStorage.setItem("senderName", currSender.username);
-  window.localStorage.setItem("senderImage", currSender.imageUrl);
-  const currSenderExists = window.localStorage.getItem("senderName");
+  const [allMessages, setAllMessages] = useState(["hi"]);
 
-  const [allMessages, setAllMessages] = useState([]);
+  const allMessageRef = useRef([]);
+  allMessageRef.current = allMessages;
 
   const getMessages = (username) => {
     const headers = {
       Authorization: props.token,
     };
-    const params = { sender: username };
     axios
-      .get(`/api/messages/${params.sender}`, { headers })
+      .get(`/api/messages/${username}`, { headers })
       .then((response) => {
         const messages = response.data;
-        if (messages != allMessages) {
+        if (
+          messages[messages.length - 1]["_id"] !=
+          allMessageRef.current[allMessageRef.current.length - 1]["_id"]
+        ) {
           setAllMessages(messages);
-          console.log(messages);
-          console.log(allMessages);
         }
       })
       .catch((err) => {
-        console.log(err.response);
+        console.log("oo");
+        console.log(err);
       });
   };
 
   useEffect(() => {
     const checkForMessages = setInterval(() => {
-      const sender = window.localStorage.getItem("senderName");
-      getMessages(sender);
-    }, 1000);
+      getMessages(senderRef.current.username);
+    }, 500);
     return () => {
       clearInterval(checkForMessages);
     };
   }, []);
 
-  const scrolldown = useRef(null);
+  useEffect(() => {
+    console.log("mount");
+    return () => {
+      console.log("unount");
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   scrolldown.current.scrollTop = scrolldown.current.scrollHeight;
-  // }, [allMessages]);
+  const messageConatinerRef = useRef(null);
+
+  useEffect(() => {
+    messageConatinerRef.current.scrollTop =
+      messageConatinerRef.current.scrollHeight;
+  }, [allMessages]);
 
   return (
-    <div className="container" style={{ minWidth: "1300px" }}>
+    <div className="container" style={{ minWidth: "1600px" }}>
       <div className="container-fluid h-100">
         <div className="row justify-content-center h-100">
           <div className="col-md-4 col-xl-3 chat">
@@ -165,17 +183,17 @@ const Messages = (props) => {
               <div className="card-header msg_head">
                 <div className="d-flex bd-highlight">
                   <div className="img_cont">
-                    {currSenderExists ? (
+                    {currSender.imageUrl ? (
                       <img
-                        src={currSender.imageUrl}
+                        src={senderRef.current.imageUrl}
                         className="rounded-circle user_img"
                       />
                     ) : null}
                     {/* <span className="online_icon"></span> */}
                   </div>
                   <div className="user_info">
-                    {currSenderExists ? (
-                      <span>Chat with {currSender.username}</span>
+                    {currSender.username ? (
+                      <span>Chat with {senderRef.current.username}</span>
                     ) : null}
                   </div>
                 </div>
@@ -209,15 +227,14 @@ const Messages = (props) => {
               </div>
 
               <div
-                ref={scrolldown}
-                id="scroll_down"
+                ref={messageConatinerRef}
                 className="card-body msg_card_body"
               >
                 {allMessages.map((message) => (
                   <Message
                     imageUrl={
                       message.recipient == props.username
-                        ? currSender.imageUrl
+                        ? senderRef.current.imageUrl
                         : props.imageUrl
                     }
                     messageText={message.message}
@@ -243,9 +260,3 @@ const Messages = (props) => {
 };
 
 export default Messages;
-
-/*
-  on sender change change sender pic
-  change messages
-  set interval to check messages if changed set new messages wusing state to refressh
-*/

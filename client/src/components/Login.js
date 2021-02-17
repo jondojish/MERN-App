@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import logo from "../images/logo.png";
-import "../css/signin.css";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -20,7 +19,6 @@ const Login = (props) => {
       .then((response) => {
         const token = response.data.token;
         props.setToken(token);
-        console.log(token);
         return null;
       })
       .catch((err) => {
@@ -49,7 +47,6 @@ const Login = (props) => {
         validate={(values) => {
           var errors = {};
           if (!values.email) {
-            console.log(errors);
             errors.email = "Required";
           }
           if (!values.password) {

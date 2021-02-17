@@ -119,4 +119,19 @@ router.delete("/", auth, (req, res) => {
     .catch((err) => res.status(404).json({ error: "id not found" }));
 });
 
+// @route GET api/users/taken:username:email
+// @desc Checks if username or email is taken
+// @access public
+router.get("/taken/:username/:email", (req, res) => {
+  const { username, email } = req.params;
+  User.find({ $or: [{ username }, { email }] })
+    .then((users) => {
+      if (users.length == 0) return res.status(200).json({ taken: false });
+      return res.status(200).json({ taken: true });
+    })
+    .catch((err) => {
+      res.status(500);
+    });
+});
+
 module.exports = router;

@@ -44,7 +44,6 @@ router.get("/names", auth, (req, res) => {
 // @desc Get names of people messaged via a partial name
 // @access Private
 router.get("/names/:nameSearched", auth, (req, res) => {
-  console.log("hi");
   const username = req.user.username;
   const nameSearched = req.params.nameSearched;
   let alreadyAdded = [];

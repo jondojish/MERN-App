@@ -7,14 +7,19 @@ import MyNav from "./components/MyNav";
 import Home from "./components/Home";
 import Messages from "./components/Messages";
 import Profile from "./components/Profile";
-import Chat from "./components/Chat";
+import Confirmation from "./components/Confirmation";
 import "./css/style.css";
+import "./css/signin.css";
 import axios from "axios";
 
 import "./css/messages.scss";
 
 const App = (props) => {
   document.title = "Home";
+
+  const [tempUser, setTempUser] = useState(null);
+
+  const [confirmationCode, setConfirmationCode] = useState(null);
 
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
@@ -57,10 +62,36 @@ const App = (props) => {
             render={(props) => {
               if (!token) {
                 return (
-                  <Register {...props} token={token} setToken={setToken} />
+                  <Register
+                    setTempUser={setTempUser}
+                    setConfirmationCode={setConfirmationCode}
+                    {...props}
+                    token={token}
+                    setToken={setToken}
+                  />
                 );
               } else {
                 return <Logout {...props} token={token} setToken={setToken} />;
+              }
+            }}
+          />
+          <Route
+            exact
+            path="/confirmation"
+            render={(props) => {
+              if (confirmationCode) {
+                return (
+                  <Confirmation
+                    {...props}
+                    tempUser={tempUser}
+                    setTempUser={setTempUser}
+                    setToken={setToken}
+                    confirmationCode={confirmationCode}
+                    setConfirmationCode={setConfirmationCode}
+                  />
+                );
+              } else {
+                return <Home {...props} token={token} setToken={setToken} />;
               }
             }}
           />

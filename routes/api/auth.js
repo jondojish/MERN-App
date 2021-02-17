@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 const jwtSecret = process.env.jwtSecret;
 
@@ -59,7 +60,6 @@ router.post("/", (req, res) => {
 // @route POST api/auth/changePassword
 // @desc change Users password
 // @access Private
-
 router.post("/changePassword", auth, (req, res) => {
   username = req.user.username;
   [newPass, oldPassEntered] = [req.body.newPass, req.body.oldPassEntered];
@@ -93,6 +93,39 @@ router.post("/changePassword", auth, (req, res) => {
     .catch((err) => {
       res.status(500);
     });
+});
+
+// @route GET api/auth/email
+// @desc GET verification code
+// @access Public
+router.get("/email/:email", (req, res) => {
+  const email = req.params.email;
+  const randomCode = Math.floor(Math.random() * Math.floor(10000));
+
+  const transporter = nodemailer.createTransport({
+    service: process.env.botService,
+    auth: {
+      user: process.env.botEmail,
+      pass: process.env.botPass,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.botEmail,
+    to: email,
+    subject: "Confirmation Code",
+    text: `Your verification code is: ${randomCode}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      res.status(500);
+    } else {
+      console.log("Email sent: " + info.response);
+      res.status(200).json({ code: randomCode });
+    }
+  });
 });
 
 module.exports = router;

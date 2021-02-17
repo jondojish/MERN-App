@@ -14,6 +14,8 @@ import axios from "axios";
 import "./css/messages.scss";
 
 const App = (props) => {
+  document.title = "Home";
+
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
 
@@ -82,7 +84,7 @@ const App = (props) => {
           />
           <Route
             exact
-            path="/messages"
+            path="/messaging"
             render={(props) => {
               if (token) {
                 return (
@@ -100,28 +102,21 @@ const App = (props) => {
           />
           <Route
             exact
-            path="/chat"
+            path="/profile"
             render={(props) => {
               if (token) {
-                return <Chat {...props} />;
+                return (
+                  <Profile
+                    {...user}
+                    {...props}
+                    setUser={setUser}
+                    token={token}
+                    setToken={setToken}
+                  />
+                );
               } else {
                 return <Login token={token} setToken={setToken} {...props} />;
               }
-            }}
-          />
-          <Route
-            exact
-            path="/profile"
-            render={(props) => {
-              return (
-                <Profile
-                  {...user}
-                  {...props}
-                  setUser={setUser}
-                  token={token}
-                  setToken={setToken}
-                />
-              );
             }}
           />
         </Switch>

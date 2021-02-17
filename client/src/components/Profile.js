@@ -14,6 +14,8 @@ const passIsValid = (pass1, pass2) => {
 };
 
 const Profile = (props) => {
+  document.title = "Profile";
+
   const [uploadImage, setImage] = useState(null);
 
   const refreshImage = () => {

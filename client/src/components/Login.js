@@ -7,6 +7,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { TextField, Button } from "@material-ui/core";
 
 const Login = (props) => {
+  document.title = "Login";
+
   const submitLogin = ({ email, password }) => {
     const data = { email, password };
     const headers = {
@@ -19,7 +21,6 @@ const Login = (props) => {
         const token = response.data.token;
         props.setToken(token);
         console.log(token);
-        // props.history.push("/profile");
         return null;
       })
       .catch((err) => {

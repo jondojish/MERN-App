@@ -64,7 +64,7 @@ const MyNav = (props) => {
               style={{ color: "white" }}
               className="nav-item nav-link"
               onClick={() => {
-                props.history.push("/messages");
+                props.history.push("/messaging");
               }}
             >
               Messages

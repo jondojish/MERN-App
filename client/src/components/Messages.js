@@ -6,6 +6,8 @@ import { v4 as uuid } from "uuid";
 import { NameTag, Message, MessageInput } from "./msgComponents";
 
 const Messages = (props) => {
+  document.title = "Messaging";
+
   const [currMessage, setCurrMessage] = useState("");
 
   const sendMessage = () => {

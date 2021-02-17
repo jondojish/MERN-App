@@ -4,6 +4,7 @@ import "../css/style.css";
 import axios from "axios";
 
 const Logout = (props) => {
+  document.title = "Logout";
   return (
     <form
       onSubmit={() => {

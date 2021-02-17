@@ -111,7 +111,6 @@ const Messages = (props) => {
       if (senderRef.current.username) {
         getMessages(senderRef.current.username);
       }
-      getChatList();
     }, 500);
     return () => {
       clearInterval(checkForMessages);

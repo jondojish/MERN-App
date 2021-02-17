@@ -57,8 +57,10 @@ const Messages = (props) => {
   senderRef.current = currSender;
 
   useEffect(() => {
-    localStorage.setItem("senderName", currSender.username);
-    localStorage.setItem("senderImage", currSender.imageUrl);
+    if (senderRef.current.username) {
+      localStorage.setItem("senderName", currSender.username);
+      localStorage.setItem("senderImage", currSender.imageUrl);
+    }
   }, [currSender]);
 
   const getChatList = () => {
@@ -190,7 +192,7 @@ const Messages = (props) => {
               <div className="card-header msg_head">
                 <div className="d-flex bd-highlight">
                   <div className="img_cont">
-                    {currSender.imageUrl ? (
+                    {senderRef.current.imageUrl ? (
                       <img
                         src={senderRef.current.imageUrl}
                         className="rounded-circle user_img"
@@ -199,7 +201,7 @@ const Messages = (props) => {
                     {/* <span className="online_icon"></span> */}
                   </div>
                   <div className="user_info">
-                    {currSender.username ? (
+                    {senderRef.current.username ? (
                       <span>Chat with {senderRef.current.username}</span>
                     ) : null}
                   </div>

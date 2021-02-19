@@ -7,55 +7,25 @@ import { NameTag, Message, MessageInput } from "./msgComponents";
 
 const Messages = (props) => {
   document.title = "Messaging";
+  // frequently used hearder containing Auth
+  const headers = { Authorization: props.token };
 
-  const [currMessage, setCurrMessage] = useState("");
+  // Sender Specific
 
-  const sendMessage = () => {
-    const data = {
-      message: currMessage,
-      recipient: senderRef.current.username,
-    };
-    const headers = {
-      Authorization: props.token,
-      "Content-Type": "application/json",
-    };
-    axios
-      .post("/api/messages", data, { headers })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err.response);
-      });
-  };
-
-  const [users, setUsers] = useState([]);
-  const searchNames = (name) => {
-    if (!name) {
-      getChatList();
-    } else {
-      const headers = { Authorization: props.token };
-      axios
-        .get(`/api/users/search/${name}`, { headers })
-        .then((response) => {
-          setUsers(response.data);
-        })
-        .catch((err) => {
-          console.log(err.response);
-        });
-    }
-  };
-
+  // sender is stored in local storage
   const senderName = localStorage.getItem("senderName");
   const senderImage = localStorage.getItem("senderImage");
 
+  // Current sender is retrieved from local storage if exists
   const [currSender, setCurrSender] = useState(
     senderName ? { username: senderName, imageUrl: senderImage } : {}
   );
 
+  // useRef to prevent re-rendering when accessing sender IDK why
   const senderRef = useRef({});
   senderRef.current = currSender;
 
+  // Stores sender in local storage when sender is changed
   useEffect(() => {
     if (senderRef.current.username) {
       localStorage.setItem("senderName", currSender.username);
@@ -63,8 +33,10 @@ const Messages = (props) => {
     }
   }, [currSender]);
 
+  // Chat List
+
+  // Gets Recently messaged users
   const getChatList = () => {
-    const headers = { Authorization: props.token };
     axios
       .get("/api/messages/names", { headers })
       .then((response) => {
@@ -75,24 +47,64 @@ const Messages = (props) => {
       });
   };
 
+  // Gets Recently messaged users on reload
   useEffect(() => {
     getChatList();
   }, []);
 
-  const [allMessages, setAllMessages] = useState([]);
+  // State contains users to be mapped in chat list
+  const [users, setUsers] = useState([]);
 
+  // Gets users where name searched is in username
+  const searchNames = (partialName) => {
+    // Gets recently messaged users if empty
+    if (!partialName) {
+      getChatList();
+    } else {
+      axios
+        .get(`/api/users/search/${partialName}`, { headers })
+        .then((response) => {
+          setUsers(response.data);
+        })
+        .catch((err) => {
+          console.log(err.response);
+        });
+    }
+  };
+
+  // Sending Messages
+
+  // currently inputed message
+  const [currMessage, setCurrMessage] = useState("");
+
+  // Post request to send a message
+  const sendMessage = () => {
+    const data = {
+      message: currMessage,
+      recipient: senderRef.current.username,
+    };
+    axios
+      .post("/api/messages", data, { headers })
+      .then((response) => {})
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
+  // Getting Messages
+
+  // useRef to prevent re-rendering when accessing messages IDK why
+  const [allMessages, setAllMessages] = useState([]);
   const allMessageRef = useRef([]);
   allMessageRef.current = allMessages;
 
+  // Gets all messages from requested user
   const getMessages = (username) => {
-    const headers = {
-      Authorization: props.token,
-    };
     axios
       .get(`/api/messages/${username}`, { headers })
       .then((response) => {
         const messages = response.data;
-        if (allMessages.length != 0) {
+        if (messages.length != 0 && allMessageRef.current.length != 0) {
           if (
             messages[messages.length - 1]["_id"] !=
             allMessageRef.current[allMessageRef.current.length - 1]["_id"]
@@ -108,6 +120,7 @@ const Messages = (props) => {
       });
   };
 
+  // checks for new messages every n milliseconds
   useEffect(() => {
     const checkForMessages = setInterval(() => {
       if (senderRef.current.username) {
@@ -119,19 +132,61 @@ const Messages = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("mount");
-    return () => {
-      console.log("unount");
-    };
-  }, []);
+  // Action Menu
 
+  // scrolls to bottom when a new message is sent/recieved
   const messageConatinerRef = useRef(null);
-
   useEffect(() => {
     messageConatinerRef.current.scrollTop =
       messageConatinerRef.current.scrollHeight;
   }, [allMessages]);
+
+  const actionMenu = useRef(null);
+
+  // Following
+
+  // Return weather or not the client is following the current sender
+  const checkIfFollowing = (username) => {
+    return axios
+      .get(`/api/users/${username}`)
+      .then((response) => {
+        return response.data.followers.includes(props.username);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // checks if following after eery sender change
+  const [isFollowing, setIsFollowing] = useState(false);
+  useEffect(() => {
+    checkIfFollowing(senderRef.current.username).then((following) => {
+      setIsFollowing(following);
+    });
+  }, [senderRef.current, []]);
+
+  // follows a requested user
+  const follow = async (username) => {
+    console.log(headers);
+    const data = { username };
+    return axios
+      .post("/api/profile/follow", data, { headers })
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // unfollows a requested user
+  const unFollow = async (username) => {
+    const data = { username };
+    return axios
+      .post("/api/profile/unFollow", data, { headers })
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <div className="container" style={{ minWidth: "1600px" }}>
@@ -141,6 +196,7 @@ const Messages = (props) => {
             <div className="card mb-sm-3 mb-md-0 contacts_card">
               <div className="card-header">
                 <form>
+                  {/* User search  */}
                   <div className="input-group">
                     <input
                       name="name"
@@ -183,13 +239,13 @@ const Messages = (props) => {
                   ))}
                 </ul>
               </div>
-
               <div className="card-footer"></div>
             </div>
           </div>
           <div className="col-md-8 col-xl-6 chat">
             <div className="card">
               <div className="card-header msg_head">
+                {/* Messages header */}
                 <div className="d-flex bd-highlight">
                   <div className="img_cont">
                     {senderRef.current.imageUrl ? (
@@ -206,30 +262,53 @@ const Messages = (props) => {
                     ) : null}
                   </div>
                 </div>
-                <span id="action_menu_btn">
+                {/* User options */}
+                <span
+                  onClick={() => {
+                    if (actionMenu.current.style.display == "none") {
+                      actionMenu.current.style.display = "flex";
+                    } else {
+                      actionMenu.current.style.display = "none";
+                    }
+                  }}
+                  id="action_menu_btn"
+                >
                   <i className="fas fa-ellipsis-v"></i>
                 </span>
-                <div className="action_menu">
+                <div
+                  style={{ display: "none" }}
+                  ref={actionMenu}
+                  className="action_menu"
+                >
                   <ul>
-                    <li>
-                      <button id="li-button">
-                        <i className="fas fa-user-circle"></i> View profile{" "}
-                      </button>
+                    <li
+                      onClick={() => {
+                        props.history.push(
+                          `/profile/${senderRef.current.username}`
+                        );
+                      }}
+                    >
+                      <i className="fas fa-user-circle"></i> View profile{" "}
+                    </li>
+                    <li
+                      onClick={async (event) => {
+                        if (!isFollowing) {
+                          await follow(senderRef.current.username);
+                          setIsFollowing(true);
+                        } else {
+                          await unFollow(senderRef.current.username);
+                          setIsFollowing(false);
+                        }
+                      }}
+                    >
+                      <i className="fas fa-users"></i>
+                      {isFollowing ? "Following" : "Follow"}
                     </li>
                     <li>
-                      <button id="li-button">
-                        <i className="fas fa-users"></i> Add to close friends
-                      </button>
+                      <i className="fas fa-plus"></i> Add to group
                     </li>
                     <li>
-                      <button id="li-button">
-                        <i className="fas fa-plus"></i> Add to group
-                      </button>
-                    </li>
-                    <li>
-                      <button id="li-button">
-                        <i className="fas fa-ban"></i> Block
-                      </button>
+                      <i className="fas fa-ban"></i> Block
                     </li>
                   </ul>
                 </div>
@@ -241,6 +320,7 @@ const Messages = (props) => {
               >
                 {allMessages.map((message) => (
                   <Message
+                    key={uuid()}
                     imageUrl={
                       message.recipient == props.username
                         ? senderRef.current.imageUrl

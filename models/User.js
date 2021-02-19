@@ -20,6 +20,14 @@ const UserSchema = new Schema({
     type: String,
     default: process.env.defaultImg,
   },
+  followers: {
+    type: Array,
+    default: [],
+  },
+  following: {
+    type: Array,
+    default: [],
+  },
   added: {
     type: Date,
     default: Date.now,

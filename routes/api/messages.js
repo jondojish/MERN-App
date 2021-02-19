@@ -21,7 +21,6 @@ router.get("/names", auth, (req, res) => {
         if (msg.sender != username && !alreadyAdded.includes(msg.sender)) {
           user = await User.findOne({ username: msg.sender });
           imageUrl = user.imageUrl;
-          console.log;
           names.push({ username: msg.sender, imageUrl });
           alreadyAdded.push(msg.sender);
         }
@@ -52,7 +51,6 @@ router.get("/names/:nameSearched", auth, (req, res) => {
     $or: [{ sender: username }, { recipient: username }],
   })
     .then((messages) => {
-      console.log(messages);
       for (msg of messages) {
         if (
           msg.sender != username &&
@@ -67,7 +65,6 @@ router.get("/names/:nameSearched", auth, (req, res) => {
           msg.recipient.includes(nameSearched) &&
           !alreadyAdded.includes(msg.recipient)
         ) {
-          console.log(msg);
           names.push({
             username: msg.recipient,
             imageUrl: msg.recipientImageUrl,
@@ -75,7 +72,6 @@ router.get("/names/:nameSearched", auth, (req, res) => {
           alreadyAdded.push(msg.recipient);
         }
       }
-      console.log(names);
       res.status(200).json(names);
     })
     .catch((err) => {
@@ -121,7 +117,6 @@ router.post("/", auth, (req, res) => {
         recipientImageUrl,
         message,
       });
-      console.log(newMessage);
       newMessage
         .save()
         .then((newMessage) => {

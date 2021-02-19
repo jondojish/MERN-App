@@ -34,6 +34,7 @@ const passIsValid = (pass1, pass2) => {
   if (pass1 != pass2) errors.push("\nPasswords dont match");
   if (pass1.length < 8) errors.push("\nPassword must be at least 8 characters");
   if (!/\d/.test(pass1))
+    //  chack for at least 1 digit
     errors.push("\nPassword must contain at least on digit");
   if (errors.length > 0) return { errors };
   return true;
@@ -96,6 +97,7 @@ const Register = (props) => {
 
           checkTaken(values).then((taken) => {
             if (!taken) {
+              // stores the user in state then saves user when confirmation code is entered
               props.setTempUser({
                 username: values.username,
                 email: values.email,

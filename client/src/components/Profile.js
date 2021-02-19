@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -16,6 +16,7 @@ const passIsValid = (pass1, pass2) => {
 const Profile = (props) => {
   document.title = "Profile";
 
+  // Currently entered image
   const [uploadImage, setImage] = useState(null);
 
   const refreshImage = () => {
@@ -23,7 +24,6 @@ const Profile = (props) => {
     axios
       .get("/api/users", { headers })
       .then((response) => {
-        console.log(response.data);
         props.setUser(response.data);
       })
       .catch((err) => {
@@ -33,6 +33,7 @@ const Profile = (props) => {
 
   const [submitErrors, setSubmitErrors] = useState([]);
 
+  // Change password of client
   const changePassword = ({ newPass1, newPass2, oldPass }) => {
     const passValid = passIsValid(newPass1, newPass2);
     if (passValid !== true) {
@@ -47,7 +48,6 @@ const Profile = (props) => {
       axios
         .post("/api/auth/changePassword", data, { headers })
         .then((response) => {
-          console.log(response);
           setSubmitErrors((prevErr) => [...prevErr, response.data.msg]);
         })
         .catch((err) => {
@@ -56,6 +56,7 @@ const Profile = (props) => {
     }
   };
 
+  // Changes profile picture of client
   const changeProfilePic = (event) => {
     const formData = new FormData();
     formData.append("file", uploadImage, uploadImage.filename);
@@ -66,7 +67,6 @@ const Profile = (props) => {
     axios
       .post("/api/profile/image", formData, { headers })
       .then((response) => {
-        console.log(response.data);
         refreshImage();
         setSubmitErrors((prevErrors) => [
           ...prevErrors,
@@ -126,7 +126,18 @@ const Profile = (props) => {
               style={{ width: "150px" }}
               alt="coat"
             />
-            <p>Email: {props.email}</p>
+            <div>
+              {props.followers ? (
+                <pre>
+                  {props.followers.length} followers{"       "}
+                  {props.following.length} following
+                </pre>
+              ) : null}
+            </div>
+            <div style={{ lineHeight: "8px" }}>
+              <p>{props.username}</p>
+              <p>Email: {props.email}</p>
+            </div>
             <p>Change Password:</p>
             <Field
               placeholder="old password"
@@ -158,7 +169,6 @@ const Profile = (props) => {
               accept="image/x-png,image/jpeg"
               onChange={(event) => {
                 setImage(event.target.files[0]);
-                console.log(event.target.files[0]);
               }}
             />
 

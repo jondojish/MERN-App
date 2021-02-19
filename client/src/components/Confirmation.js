@@ -7,7 +7,6 @@ const Confirmation = (props) => {
   const [submitError, setSubmitError] = useState(null);
 
   const register = ({ username, email, password }) => {
-    console.log(username, email, password);
     const data = { username, email, password };
     return axios
       .post("/api/users", data)
@@ -42,7 +41,6 @@ const Confirmation = (props) => {
           validate={(values) => {
             var errors = {};
             if (!values.code) {
-              console.log(errors);
               errors.code = "Required";
             }
             return errors;

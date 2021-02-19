@@ -7,7 +7,7 @@ const users = require("./routes/api/users");
 const auth = require("./routes/api/auth");
 const messages = require("./routes/api/messages");
 
-const imageUpload = require("./imageUpload");
+const profile = require("./routes/api/profile");
 
 const app = express();
 
@@ -18,8 +18,6 @@ app.use(express.json());
 const db = process.env.mongoURI;
 
 // Connect to Mongo
-
-const mongoUser = require("./config/mongoUser");
 
 const options = {
   useNewUrlParser: true,
@@ -40,7 +38,7 @@ mongoose
 app.use("/api/users", users);
 app.use("/api/auth", auth);
 app.use("/api/messages", messages);
-app.use("/api/profile", imageUpload);
+app.use("/api/profile", profile);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {

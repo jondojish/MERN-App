@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const auth = require("../../middleware/auth");
 mongoose = require("mongoose");
 
-const jwtSecret = require("../../config/keys").jwtSecret;
+const jwtSecret = process.env.jwtSecret;
 
 // User Model
 const User = require("../../models/User");
@@ -28,9 +28,12 @@ router.get("/:username", (req, res) => {
       if (!user) {
         return res.status(404).json({ msg: "user not found" });
       }
-      return res
-        .status(200)
-        .json({ username: user.username, imageUrl: user.imageUrl });
+      return res.status(200).json({
+        username: user.username,
+        imageUrl: user.imageUrl,
+        followers: user.followers,
+        following: user.following,
+      });
     })
     .catch((err) => res.status(500));
 });

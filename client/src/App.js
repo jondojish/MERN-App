@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
 import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
+import axios from "axios";
+
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Logout from "./components/Logout";
 import MyNav from "./components/MyNav";
 import Home from "./components/Home";
-import Messages from "./components/Messages";
+import Messages from "./components/Messaging";
 import Profile from "./components/Profile";
+import OtherProfile from "./components/OtherProfile";
 import Confirmation from "./components/Confirmation";
+
 import "./css/style.css";
 import "./css/signin.css";
-import axios from "axios";
-
 import "./css/messages.scss";
 
 const App = (props) => {
@@ -31,8 +33,8 @@ const App = (props) => {
     const headers = { Authorization: token };
     axios
       .get("/api/users", { headers: headers })
-      .then((currUser) => {
-        setUser(currUser.data);
+      .then((response) => {
+        setUser(response.data);
       })
       .catch((err) => {
         console.log(err);
@@ -146,8 +148,15 @@ const App = (props) => {
                   />
                 );
               } else {
-                return <Login token={token} setToken={setToken} {...props} />;
+                return <Login setToken={setToken} {...props} />;
               }
+            }}
+          />
+          <Route
+            exact
+            path="/profile/:username"
+            render={(props) => {
+              return <OtherProfile token={token} {...user} {...props} />;
             }}
           />
         </Switch>

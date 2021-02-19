@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtSecret = require("../config/keys").jwtSecret;
+const jwtSecret = process.env.jwtSecret;
 const User = require("../models/User");
 
 // Is called duiring redirect
@@ -12,7 +12,6 @@ auth = (req, res, next) => {
 
   jwt.verify(token, jwtSecret, (err, decoded) => {
     if (err) {
-      console.log("inv");
       return res.status(500).json({ msg: "invalid token" });
     }
     User.findById(decoded.id)

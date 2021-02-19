@@ -6,15 +6,7 @@ const MessageSchema = new Schema({
     type: String,
     required: true,
   },
-  senderImageUrl: {
-    type: String,
-    required: true,
-  },
   recipient: {
-    type: String,
-    required: true,
-  },
-  recipientImageUrl: {
     type: String,
     required: true,
   },

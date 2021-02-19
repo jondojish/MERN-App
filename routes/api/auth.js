@@ -96,7 +96,7 @@ router.post("/changePassword", auth, (req, res) => {
 });
 
 // @route GET api/auth/email
-// @desc GET verification code
+// @desc Send verification code to email then return code
 // @access Public
 router.get("/email/:email", (req, res) => {
   const email = req.params.email;

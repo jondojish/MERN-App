@@ -14,7 +14,6 @@ export const NameTag = (props) => {
             username,
             imageUrl,
           });
-          console.log(username);
           props.getMessages(username);
         }}
         id="sender"
@@ -38,7 +37,7 @@ export const Message = (props) => {
   const recieved = props.recieved;
   if (recieved) {
     return (
-      <div key={uuid()} className="d-flex justify-content-start mb-4">
+      <div className="d-flex justify-content-start mb-4">
         <div className="img_cont_msg">
           <img src={imageUrl} className="rounded-circle user_img_msg" />
         </div>
@@ -50,7 +49,7 @@ export const Message = (props) => {
     );
   }
   return (
-    <div key={uuid()} className="d-flex justify-content-end mb-4">
+    <div className="d-flex justify-content-end mb-4">
       <div className="msg_cotainer_send">
         <p id="msg">{messageText}</p>
         <span className="msg_time_send"></span>
@@ -63,13 +62,17 @@ export const Message = (props) => {
 };
 
 export const MessageInput = (props) => {
+  const handleMessageSubmit = () => {
+    props.sendMessage();
+    props.setCurrMessage("");
+    props.getMessages(props.currSender.username);
+  };
+
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        props.sendMessage();
-        props.setCurrMessage("");
-        props.getMessages(props.currSender.username);
+        handleMessageSubmit();
       }}
     >
       <div className="card-footer">

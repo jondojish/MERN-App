@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "../css/messages.css";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
+import io from "socket.io-client";
 
 import { NameTag, Message, MessageInput } from "./msgComponents";
 
@@ -30,8 +31,9 @@ const Messages = (props) => {
     if (senderRef.current.username) {
       localStorage.setItem("senderName", currSender.username);
       localStorage.setItem("senderImage", currSender.imageUrl);
+      getMessages(senderRef.current.username);
     }
-  }, [currSender]);
+  }, [senderRef.current.username]);
 
   // Chat List
 
@@ -72,10 +74,23 @@ const Messages = (props) => {
     }
   };
 
-  // Sending Messages
+  // Sending + Recieving Messages
 
   // currently inputed message
   const [currMessage, setCurrMessage] = useState("");
+
+  const socket = io("ws://localhost:8080");
+
+  useEffect(() => {
+    // handle the event sent with socket.emit() from server
+    socket.on("message", (message) => {
+      // message is only displayed if it belongs to client
+      if (message.recipient == props.username) {
+        setAllMessages([...allMessageRef.current, message]);
+      }
+    });
+    return () => {};
+  }, [props.username, []]);
 
   // Post request to send a message
   const sendMessage = () => {
@@ -83,6 +98,8 @@ const Messages = (props) => {
       message: currMessage,
       recipient: senderRef.current.username,
     };
+    // emits message to server, which re-emits to other clients
+    socket.emit("message", { ...data, sender: props.username });
     axios
       .post("/api/messages", data, { headers })
       .then((response) => {})
@@ -120,19 +137,7 @@ const Messages = (props) => {
       });
   };
 
-  // checks for new messages every n milliseconds
-  useEffect(() => {
-    const checkForMessages = setInterval(() => {
-      if (senderRef.current.username) {
-        getMessages(senderRef.current.username);
-      }
-    }, 500);
-    return () => {
-      clearInterval(checkForMessages);
-    };
-  }, []);
-
-  // Action Menu
+  // DOM Elements
 
   // scrolls to bottom when a new message is sent/recieved
   const messageConatinerRef = useRef(null);
@@ -141,6 +146,7 @@ const Messages = (props) => {
       messageConatinerRef.current.scrollHeight;
   }, [allMessages]);
 
+  // Triple Dot action menu
   const actionMenu = useRef(null);
 
   // Following
@@ -318,7 +324,7 @@ const Messages = (props) => {
                 ref={messageConatinerRef}
                 className="card-body msg_card_body"
               >
-                {allMessages.map((message) => (
+                {allMessageRef.current.map((message) => (
                   <Message
                     key={uuid()}
                     imageUrl={

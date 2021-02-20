@@ -79,7 +79,7 @@ const OtherProfile = (props) => {
   return (
     <div
       style={{
-        minWidth: "30vw",
+        minWidth: "27vw",
         minHeight: "40vh",
         fontSize: "20px",
         textAlign: "center",
@@ -87,7 +87,7 @@ const OtherProfile = (props) => {
       className="form-signin"
     >
       <img
-        src={currProfile.imageUrl || "j"}
+        src={currProfile.imageUrl}
         className="rounded-circle"
         style={{ width: "100px" }}
         alt="coat"
@@ -98,6 +98,19 @@ const OtherProfile = (props) => {
           {currProfile.followers.length} followers{"       "}
           {currProfile.following.length} following
         </pre>
+        <button
+          style={{ marginRight: "90px" }}
+          onClick={(event) => {
+            // Sender is retrieved from local storage so when redirected
+            // to messages currProfile is Sender
+            localStorage.setItem("senderName", currProfile.username);
+            localStorage.setItem("senderImage", currProfile.imageUrl);
+            props.history.push("/messaging");
+          }}
+          id="follow-button"
+        >
+          Message
+        </button>
         <button
           onClick={(event) => {
             if (isFollowing) {

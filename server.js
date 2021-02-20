@@ -52,4 +52,17 @@ if (process.env.NODE_ENV === "production") {
 
 const port = process.env.PORT || 5000;
 
+const io = require("socket.io")(8080, {
+  // Allows requests from any
+  cors: { origin: "*" },
+});
+
+io.on("connection", (socket) => {
+  // handle the event sent with socket.emit()
+  socket.on("message", (message) => {
+    // re-emit message to all clients connect to socket
+    io.emit("message", message);
+  });
+});
+
 app.listen(port, () => `Server running on port ${port}`);

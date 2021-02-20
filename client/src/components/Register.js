@@ -121,30 +121,60 @@ const Register = (props) => {
       >
         {({ isSubmitting }) => (
           <Form>
+            <div style={{ marginRight: "53%" }}>
+              <label>Username:</label>
+            </div>
             <Field
-              style={fieldStyle}
+              style={{ ...fieldStyle, marginTop: "-10px" }}
               placeholder="username"
               type="text"
               name="username"
               as={TextField}
             />
+            <div
+              style={{
+                marginRight: "63%",
+                marginBottom: "0px",
+                marginTop: "10px",
+              }}
+            >
+              <label>Email:</label>
+            </div>
             <Field
-              style={fieldStyle}
+              style={{ ...fieldStyle, marginTop: "-10px" }}
               placeholder="email"
               type="email"
               name="email"
               as={TextField}
             />
             <ErrorMessage name="email" component="div" />
+            <div
+              style={{
+                marginRight: "55%",
+                marginBottom: "0px",
+                marginTop: "10px",
+              }}
+            >
+              <label>Password:</label>
+            </div>
             <Field
-              style={fieldStyle}
+              style={{ ...fieldStyle, marginTop: "-10px" }}
               placeholder="password"
               type="password"
               name="password1"
               as={TextField}
             />
+            <div
+              style={{
+                marginRight: "36%",
+                marginBottom: "0px",
+                marginTop: "10px",
+              }}
+            >
+              <label>Confirm password</label>
+            </div>
             <Field
-              style={fieldStyle}
+              style={{ ...fieldStyle, marginTop: "-10px" }}
               placeholder="confirm password"
               type="password"
               name="password2"
@@ -159,7 +189,7 @@ const Register = (props) => {
                 type="submit"
                 disabled={isSubmitting}
               >
-                Submit
+                Register
               </Button>
             </div>
           </Form>

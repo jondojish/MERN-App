@@ -26,7 +26,7 @@ const App = (props) => {
   const localToken = window.localStorage.getItem("token");
   const [token, setToken] = useState(localToken !== null ? localToken : "");
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     window.localStorage.setItem("token", token);
@@ -40,6 +40,7 @@ const App = (props) => {
         console.log(err);
       });
   }, [token]);
+  console.log(user);
 
   return (
     <div className="App">
@@ -156,7 +157,11 @@ const App = (props) => {
             exact
             path="/profile/:username"
             render={(props) => {
-              return <OtherProfile token={token} {...user} {...props} />;
+              if (token) {
+                return <OtherProfile token={token} {...user} {...props} />;
+              } else {
+                return <Login setToken={setToken} {...props} />;
+              }
             }}
           />
         </Switch>

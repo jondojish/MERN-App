@@ -7,6 +7,7 @@ import { TextField, Button } from "@material-ui/core";
 
 const Login = (props) => {
   document.title = "Login";
+  const fieldStyle = { minWidth: "75%" };
 
   const submitLogin = ({ email, password }) => {
     const data = { email, password };
@@ -32,6 +33,7 @@ const Login = (props) => {
     <div
       style={{
         textAlign: "center",
+        minWidth: "350px",
       }}
       className="form-signin"
     >
@@ -68,14 +70,26 @@ const Login = (props) => {
       >
         {({ isSubmitting }) => (
           <Form>
+            <div style={{ marginRight: "63%", marginBottom: "0px" }}>
+              <label>Email:</label>
+            </div>
             <Field
+              style={{
+                ...fieldStyle,
+                marginBottom: "20px",
+                marginTop: "-10px",
+              }}
               placeholder="email"
               type="email"
               name="email"
               as={TextField}
             />
             <ErrorMessage name="email" component="div" />
+            <div style={{ marginRight: "55%" }}>
+              <label>Password:</label>
+            </div>
             <Field
+              style={{ ...fieldStyle, marginTop: "-10px" }}
               placeholder="password"
               type="password"
               name="password"
@@ -90,7 +104,7 @@ const Login = (props) => {
                 type="submit"
                 disabled={isSubmitting}
               >
-                Submit
+                Login
               </Button>
             </div>
           </Form>

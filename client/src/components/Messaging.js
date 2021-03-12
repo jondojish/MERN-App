@@ -81,7 +81,7 @@ const Messages = (props) => {
   const socket = io(
     process.env.NODE_ENV == "production"
       ? process.env.REACT_APP_SOCKET_IO_URL
-      : "ws://localhost:8080"
+      : "ws://localhost:8080" // socket url for development
   );
 
   // Message listener

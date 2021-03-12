@@ -78,8 +78,13 @@ const Messages = (props) => {
 
   // currently inputed message
   const [currMessage, setCurrMessage] = useState("");
-
-  const socket = io("ws://localhost:8080");
+  // const socket = io("ws://socketiotestserver.herokuapp.com/");
+  const socket = io(
+    process.env.NODE_ENV == "production"
+      ? process.env.REACT_APP_SOCKET_IO_URL
+      : "ws://localhost:8080"
+  );
+  console.log("url", process.env.REACT_APP_SOCKET_IO_URL);
 
   // Message listener
   useEffect(() => {

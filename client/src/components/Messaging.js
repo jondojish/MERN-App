@@ -81,16 +81,21 @@ const Messages = (props) => {
 
   const socket = io("ws://localhost:8080");
 
+  // Message listener
   useEffect(() => {
     // handle the event sent with socket.emit() from server
     socket.on("message", (message) => {
+      console.log(message);
       // message is only displayed if it belongs to client
       if (message.recipient == props.username) {
+        console.log(true);
         setAllMessages([...allMessageRef.current, message]);
+      } else {
+        console.log(false, props.username);
       }
     });
     return () => {};
-  }, [props.username, []]);
+  }, [props.username]); // username is undefined until page loads but useEffect renders instantly
 
   // Post request to send a message
   const sendMessage = () => {

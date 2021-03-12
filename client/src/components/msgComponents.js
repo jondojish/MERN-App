@@ -65,7 +65,6 @@ export const MessageInput = (props) => {
   const handleMessageSubmit = () => {
     props.sendMessage();
     props.setCurrMessage("");
-    props.getMessages(props.currSender.username);
   };
 
   return (

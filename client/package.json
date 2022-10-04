@@ -9,12 +9,13 @@
     "@testing-library/user-event": "^12.7.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "concurrently": "^7.4.0",
     "dotenv": "^8.2.0",
     "formik": "^2.2.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.2",
+    "react-scripts": "^5.0.1",
     "reactstrap": "^8.9.0",
     "sass": "^1.32.7",
     "socket.io-client": "^3.1.1",
@@ -45,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
